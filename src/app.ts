@@ -15,6 +15,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors(corsOptions));
 // En principio el Cors lo dejamos sin valor para que sea lo más abierto pero luego hay que darle valor para no tener problemas con Sonar.
+// Por eso le pusimos el corsOptions, pero con el * para darle el valor más universal posible.
 
 // Middlewares:
 // Dentro de app el método use:
@@ -25,7 +26,7 @@ app.use((_req, _resp, next) => {
 });
 
 // _________________________________________________________________
-// MÉTODO PARA HACERLO CON ROUTER (A UTILIZAR):
+// MÉTODO PARA HACERLO CON ROUTER (MÉTODO A UTILIZAR):
 // Ejemplo con things:
 
 // Definimos la ruta y el Router a utilizar:
@@ -48,8 +49,8 @@ app.get('/', (_req, resp) => {
   // Si utilizamos este, no hay que utilizar end, o header.
   // resp.json();
   // Para enviar la respuesta json.
-  // Por eso no utilizamos el header y end.
   // resp.send();
+  // Por eso no utilizamos el header y end.
 
   // Ejemplo para envío de datos:
   resp.json({
@@ -60,7 +61,7 @@ app.get('/', (_req, resp) => {
 
 app.get('/:id', (req, resp) => {
   // Para levantar los parámetros que quiero tomar.
-  // En este caso le colocamos "id" como nombre.
+  // En este caso le colocamos "id" como nombre de la variable.
 
   resp.send('Hola ' + req.params.id);
 });
