@@ -60,7 +60,7 @@ describe('Given ThingsFileRepo repository', () => {
       expect(result).toEqual({ id: '1' });
     });
 
-    test('Then if it has an object with NO valid ID, it should throw an Error ', async () => {
+    test('Then if it has an object with NO valid ID, it should throw an Error', async () => {
       // Cambiamos el ID para que el find no encuentre el object.
       (fs.readFile as jest.Mock).mockResolvedValue('[{"id": "2"}]');
       const id = '1';
@@ -72,7 +72,7 @@ describe('Given ThingsFileRepo repository', () => {
       // Entonces tiene que estar en la misma línea el expect con la función que se ejecuta y tiraría el error.
       // Y además, debe estar en una callback para que funcione.
       // Además, cuando es Async hay que agregar el "rejects"
-      expect(async () => await repo.queryId(id)).rejects.toThrow();
+      expect(async () => repo.queryId(id)).rejects.toThrow();
     });
   });
 });

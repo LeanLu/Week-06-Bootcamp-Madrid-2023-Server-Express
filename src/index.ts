@@ -26,7 +26,9 @@ const server = http.createServer(app);
 
 server.listen(PORT);
 
-server.on('error', () => {});
+server.on('error', () => {
+  console.log('Error server (en index)');
+});
 
 server.on('listening', () => {
   console.log('Listening http://localhost: ' + PORT);
