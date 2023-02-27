@@ -1,25 +1,80 @@
-import { Request, Response } from 'express';
-import { ThingsFileRepo } from '../repository/things.file.repo';
+import { NextFunction, Request, Response } from 'express';
+import { ThingStructure } from '../entities/thing.model';
+import { Repo } from '../repository/repo.interface';
 
 export class ThingsController {
   // Le agregamos en el constructor la inyección de dependencia del repo:
-  constructor(public repo: ThingsFileRepo) {
+  constructor(public repo: Repo<ThingStructure>) {
     this.repo = repo;
   }
 
-  getAll(_req: Request, resp: Response) {
-    this.repo.read().then((data) => {
-      resp.json(data);
-    });
+  // Todos los métodos van a ser Async porque el Repo es async.
+  // Todas promesas del Controller son void.
+  // Entonces no es necesario esperar con await.
+
+  // Hay que dar una respuesta Estándar para todos:
+
+  // Además hay que agregar un try-catch para agarrar los errors en caso que no tengamos respuesta del repo.
+
+  async getAll(_req: Request, resp: Response, next: NextFunction) {
+    try {
+      const data = await this.repo.query();
+      resp.json({
+        results: data,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  get(req: Request, resp: Response) {
-    resp.send('Thing ' + req.params.id);
+  async get(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const data = await this.repo.queryId(req.params.id);
+      // Si queremos se podría mostrar el dato por consola:
+      // console.log(data);
+      resp.json({
+        results: [data],
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  post(_req: Request, _resp: Response) {}
+  async post(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const data = await this.repo.create(req.body);
+      resp.json({
+        results: [data],
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  patch(_req: Request, _resp: Response) {}
+  // Para el Patch el ID podría estar en la URL o sino en el Object. Eso se realiza desde el front.
+  // Lo más común es que venga en la URL.
+  async patch(req: Request, resp: Response, next: NextFunction) {
+    try {
+      // Verificamos si el ID viene por URL o por parámetros del body y tomamos el que corresponda:
+      req.body.id = req.params.id ? req.params.id : req.body.id;
 
-  delete(_req: Request, _resp: Response) {}
+      const data = await this.repo.update(req.body);
+      resp.json({
+        results: [data],
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, resp: Response, next: NextFunction) {
+    try {
+      const data = await this.repo.destroy(req.params.id);
+      resp.json({
+        results: [],
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

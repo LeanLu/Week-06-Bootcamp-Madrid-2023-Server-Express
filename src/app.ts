@@ -1,7 +1,7 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import { thingsRouter } from './router/things.router.js';
+import { thingsRouter } from './routers/things.router.js';
 
 export const app = express();
 
@@ -75,3 +75,12 @@ app.post('/', (req, resp) => {
 app.patch('/:id');
 
 app.delete('/:id');
+
+app.use((error: Error, _req: Request, resp: Response, _next: NextFunction) => {
+  console.log('Soy el middleware de errores');
+
+  // Se envía la respuesta como json porque esto lo recibe la consola.
+  resp.json({
+    error: [],
+  });
+});
