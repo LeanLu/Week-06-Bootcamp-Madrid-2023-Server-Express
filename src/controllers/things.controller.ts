@@ -2,10 +2,15 @@ import { NextFunction, Request, Response } from 'express';
 import { ThingStructure } from '../entities/thing.model';
 import { Repo } from '../repository/repo.interface';
 
+// Agregamos el debug con información para la consola:
+import createDebug from 'debug';
+const debug = createDebug('W6:controller');
+
 export class ThingsController {
   // Le agregamos en el constructor la inyección de dependencia del repo:
   constructor(public repo: Repo<ThingStructure>) {
     this.repo = repo;
+    debug('Controller instanced');
   }
 
   // Todos los métodos van a ser Async porque el Repo es async.
@@ -18,6 +23,7 @@ export class ThingsController {
 
   async getAll(_req: Request, resp: Response, next: NextFunction) {
     try {
+      debug('getAll method');
       const data = await this.repo.query();
       resp.json({
         results: data,
@@ -29,6 +35,7 @@ export class ThingsController {
 
   async get(req: Request, resp: Response, next: NextFunction) {
     try {
+      debug('get method');
       const data = await this.repo.queryId(req.params.id);
       // Si queremos se podría mostrar el dato por consola:
       // console.log(data);
@@ -42,6 +49,7 @@ export class ThingsController {
 
   async post(req: Request, resp: Response, next: NextFunction) {
     try {
+      debug('post method');
       const data = await this.repo.create(req.body);
       resp.json({
         results: [data],
@@ -55,6 +63,7 @@ export class ThingsController {
   // Lo más común es que venga en la URL.
   async patch(req: Request, resp: Response, next: NextFunction) {
     try {
+      debug('patch method');
       // Verificamos si el ID viene por URL o por parámetros del body y tomamos el que corresponda:
       req.body.id = req.params.id ? req.params.id : req.body.id;
 
@@ -69,6 +78,7 @@ export class ThingsController {
 
   async delete(req: Request, resp: Response, next: NextFunction) {
     try {
+      debug('delete method');
       const data = await this.repo.destroy(req.params.id);
       resp.json({
         results: [],

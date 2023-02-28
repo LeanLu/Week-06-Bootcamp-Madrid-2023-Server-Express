@@ -3,6 +3,12 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { thingsRouter } from './routers/things.router.js';
 
+// Importamos la variable debug:
+import createDebug from 'debug';
+import { CustomError } from './errors/errors.js';
+// En este caso, le agregamos al nombre que estamos en "app":
+const debug = createDebug('W6:app');
+
 export const app = express();
 
 app.disable('x-powered-by');
@@ -21,7 +27,7 @@ app.use(cors(corsOptions));
 // Dentro de app el método use:
 // Espera un callback para que lo use:
 app.use((_req, _resp, next) => {
-  console.log('Soy un middleware');
+  debug('Soy un middleware');
   next();
 });
 
@@ -53,9 +59,17 @@ app.get('/', (_req, resp) => {
   // Por eso no utilizamos el header y end.
 
   // Ejemplo para envío de datos:
+  // resp.json({
+  //   name: 'Chizzo',
+  //   age: 34,
+  // });
+
+  // En general en el GET prinicipal base, se colocan los endpoints disponibles:
   resp.json({
-    name: 'Chizzo',
-    age: 34,
+    info: 'Bootcamp APIs',
+    endpoints: {
+      things: '/things',
+    },
   });
 });
 
@@ -76,11 +90,29 @@ app.patch('/:id');
 
 app.delete('/:id');
 
-app.use((error: Error, _req: Request, resp: Response, _next: NextFunction) => {
-  console.log('Soy el middleware de errores');
+app.use(
+  (error: CustomError, _req: Request, resp: Response, _next: NextFunction) => {
+    debug('Soy el middleware de errores');
 
-  // Se envía la respuesta como json porque esto lo recibe la consola.
-  resp.json({
-    error: [],
-  });
-});
+    // Definimos la constante status con el statusCode que haya venido y si no vino nada, se queda con el 500:
+    const status = error.statusCode || 500;
+    // Lo mismo para el mensaje:
+    const statusMessage = error.statusMessage || 'Internal server error';
+
+    // Definimos el Status de la respuesta:
+    resp.status(status);
+
+    // Se envía la respuesta como json porque esto lo recibe la consola del usuario.
+    // Se envíán las variables definidas arriba.
+    resp.json({
+      error: [
+        {
+          status,
+          statusMessage,
+        },
+      ],
+    });
+    // Luego enviamos la información por consola interna:
+    debug(status, statusMessage, error.message);
+  }
+);
