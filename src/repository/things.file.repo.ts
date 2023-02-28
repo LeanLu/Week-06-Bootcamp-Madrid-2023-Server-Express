@@ -53,6 +53,8 @@ export class ThingsFileRepo implements Repo<ThingStructure> {
     // Agregamos la info al Array de data:
     const finalData = [...data, info];
 
+    // Se podría hacer también un data.push(info) porque en este caso no importa la mutación del array.
+
     // Lo convertimos en String para luego escribir en el file.
     const stringFinalData = JSON.stringify(finalData);
 
@@ -114,6 +116,10 @@ export class ThingsFileRepo implements Repo<ThingStructure> {
 
     const stringFinalData = JSON.stringify(data);
 
-    await fs.writeFile(file, stringFinalData, 'utf-8');
+    // NO es necesario colocar await porque es una Promise void.
+    // Entonces no es necesario esperar a que se resuelva porque no espero que me devuelva algo.
+    // Con await sería:
+    // await fs.writeFile(file, stringFinalData, 'utf-8');
+    fs.writeFile(file, stringFinalData, 'utf-8');
   }
 }
