@@ -122,4 +122,10 @@ export class ThingsFileRepo implements Repo<ThingStructure> {
     // await fs.writeFile(file, stringFinalData, 'utf-8');
     fs.writeFile(file, stringFinalData, 'utf-8');
   }
+
+  async search(_query: { key: string; value: unknown }) {
+    const initialData: string = await fs.readFile(file, { encoding: 'utf-8' });
+
+    return JSON.parse(initialData);
+  }
 }

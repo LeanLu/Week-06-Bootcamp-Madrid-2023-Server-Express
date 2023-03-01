@@ -9,6 +9,9 @@ export interface Repo<T> {
   create(_info: Partial<T>): Promise<T>;
   update(_info: Partial<T>): Promise<T>;
   destroy(_id: string): Promise<void>;
+  search(query: { key: string; value: unknown }): Promise<T[]>;
+  // El "search" podría ser opcional para que no haya que agregarlo en things.
+  // En este caso lo dejamos obligatorio y lo agregamos en ThingsRepo.
 }
 
 // En queryId y destroy se coloca string de momento.

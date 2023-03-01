@@ -12,6 +12,7 @@ describe('Given ThingsController', () => {
     queryId: jest.fn(),
     update: jest.fn(),
     destroy: jest.fn(),
+    search: jest.fn(),
   };
 
   // Mockear req, resp y next:

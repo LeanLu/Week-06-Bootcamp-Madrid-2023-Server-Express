@@ -31,6 +31,22 @@ const thingSchema = new Schema<ThingStructure>({
   },
 });
 
+// Para setear métodos específicos de Schema: .set
+thingSchema.set('toJSON', {
+  // Para las salidas del tipo JSON queremos transformar:
+  transform(_document, returnedObject) {
+    // Que el "_id" de Mongo se transforme en ".id"
+    returnedObject.id = returnedObject._id;
+    // No queremos que devuelva el "__v" de la versión.
+    delete returnedObject.__v;
+    // No queremos que quede el "_id" (ya transformado arriba como ".id")
+    delete returnedObject._id;
+    // Eliminamos la línea de password para no enviar esa información. MUY importante.
+    // En este caso como no hay password lo dejamos comentado:
+    // delete returnedObject.password;
+  },
+});
+
 // Exportación de Model. Se escribe con mayúscula.
 // model --> Función que se ejecuta y devuelve un Object de tipo Model.
 // Pide primero nombre del modelo. Mongoose crea una colección con el nombre dado en minúscula y plural.

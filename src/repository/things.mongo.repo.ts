@@ -74,4 +74,11 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
 
     // Pero luego no devolvemos nada porque es una Promise void.
   }
+
+  // Agregamos el método "search" que necesitábamos para el repo user para que cumpla con la interface.
+  async search(query: { key: string; value: unknown }) {
+    debug('search method');
+    const data = await ThingModel.find({ [query.key]: query.value }).exec();
+    return data;
+  }
 }

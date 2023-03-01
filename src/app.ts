@@ -6,6 +6,7 @@ import { thingsRouter } from './routers/things.router.js';
 // Importamos la variable debug:
 import createDebug from 'debug';
 import { CustomError } from './errors/errors.js';
+import { usersRouter } from './routers/users.router.js';
 // En este caso, le agregamos al nombre que estamos en "app":
 const debug = createDebug('W6:app');
 
@@ -37,6 +38,9 @@ app.use((_req, _resp, next) => {
 
 // Definimos la ruta y el Router a utilizar:
 app.use('/things', thingsRouter);
+
+// Agregamos la ruta de users:
+app.use('/users', usersRouter);
 
 // _________________________________________________________________
 // MÉTODO SIMPLIFICADO PARA CREACIÓN DE RUTAS (NO UTILIZAR):
@@ -91,6 +95,7 @@ app.patch('/:id');
 app.delete('/:id');
 
 app.use(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (error: CustomError, _req: Request, resp: Response, _next: NextFunction) => {
     debug('Soy el middleware de errores');
 
