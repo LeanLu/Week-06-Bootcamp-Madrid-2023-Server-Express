@@ -29,6 +29,15 @@ const thingSchema = new Schema<ThingStructure>({
     min: 0,
     max: 10,
   },
+
+  owner: {
+    type: Schema.Types.ObjectId,
+    // La "ref" toma un string.
+    // Hay que ponerle el nombre que está definido en el "model" del User:
+    ref: 'User',
+    // Otra opción:
+    // type: Schema.Types.ObjectId
+  },
 });
 
 // Para setear métodos específicos de Schema: .set

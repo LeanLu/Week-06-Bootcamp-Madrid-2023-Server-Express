@@ -16,14 +16,19 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
     debug('query method');
     // Query de mongoose son como una Promise.
     // Para leer el conjunto de datos de la colección.
-    const data = await ThingModel.find();
+    // Le agregamos el método populate para incluir toda la información adicional.
+    // Dentro del model de Things, le pasamos el nombre de la propiedad que tenga una ref a los datos que queremos que popule
+    // Le podemos dar otro parámetro opcional con las cosas que no queremos que aparezca.
+    // En este caso la ref es 'User'.
+    // Luego le damos la excepción que no queremos que muestre. Ex.: "things" y hay que darle un valor de cero.
+    const data = await ThingModel.find().populate('owner', { things: 0 });
     return data;
   }
 
   async queryId(id: string): Promise<ThingStructure> {
     debug('queryID method');
     // Para la búsqueda por ID.
-    const data = await ThingModel.findById(id);
+    const data = await ThingModel.findById(id).populate('owner', { things: 0 });
 
     // Verificamos que haya un data y no sea undefined.
     // Utilizamos el error que generamos en la interface.
@@ -76,7 +81,10 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
   }
 
   // Agregamos el método "search" que necesitábamos para el repo user para que cumpla con la interface.
-  async search(query: { key: string; value: unknown }) {
+  async search(query: {
+    key: string;
+    value: unknown;
+  }): Promise<ThingStructure[]> {
     debug('search method');
     const data = await ThingModel.find({ [query.key]: query.value }).exec();
     return data;

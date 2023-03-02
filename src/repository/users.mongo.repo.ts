@@ -28,12 +28,15 @@ export class UsersMongoRepo implements Repo<UserStructure> {
 
   // Método agregado para poder hacer el login del usuario.
   // El método es llamado desde el método login del Controller.
-  async search(query: { key: string; value: unknown }) {
+  async search(query: {
+    key: string;
+    value: unknown;
+  }): Promise<UserStructure[]> {
     debug('search method');
 
     // Hay que darle como parámetro los valores generales del "query".
     // Para encontrar el valor que tiene key y darlo como parámetro, hay que utilizar el método del corchete para identificar las key que están en variables.
-    const data = await UserModel.find({ [query.key]: query.value }).exec();
+    const data = await UserModel.find({ [query.key]: query.value });
     // Esto devuelve una query que es un Array porque hacemos un find genérico.
     // Entonces podría encontrar varios o sino ser un Array vacío.
     // NUNCA devuelve un null.

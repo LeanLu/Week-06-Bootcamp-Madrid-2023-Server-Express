@@ -28,6 +28,9 @@ export class UsersController {
       // Hay que colocar un await para que se resuelva la encryptación:
       req.body.password = await Auth.hash(req.body.password);
 
+      // Creamos primero un Array vacío en el User, dentro de la propiedad "things", para que luego pueda ir guardando sus propias Things:
+      req.body.things = [];
+
       // Luego creamos el usuario.
       const data = await this.repo.create(req.body);
 
@@ -83,6 +86,7 @@ export class UsersController {
 
       // Definimos primero el Payload para coloarlo en el método para crear el Token:
       const payload: TokenPayload = {
+        id: data[0].id,
         email: data[0].email,
         role: 'Admin',
       };

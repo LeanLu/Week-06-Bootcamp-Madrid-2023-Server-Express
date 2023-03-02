@@ -4,12 +4,19 @@ import { Repo } from '../repository/repo.interface';
 
 // Agregamos el debug con información para la consola:
 import createDebug from 'debug';
+import { RequestPlus } from '../interceptors/logged';
+import { UserStructure } from '../entities/user.model';
+import { HTTPError } from '../errors/errors.js';
 const debug = createDebug('W6:controller');
 
 export class ThingsController {
   // Le agregamos en el constructor la inyección de dependencia del repo:
-  constructor(public repo: Repo<ThingStructure>) {
+  constructor(
+    public repo: Repo<ThingStructure>,
+    public repoUser: Repo<UserStructure>
+  ) {
     this.repo = repo;
+    this.repoUser = repoUser;
     debug('Controller instanced');
   }
 
@@ -47,12 +54,39 @@ export class ThingsController {
     }
   }
 
-  async post(req: Request, resp: Response, next: NextFunction) {
+  async post(req: RequestPlus, resp: Response, next: NextFunction) {
     try {
       debug('post method');
-      const data = await this.repo.create(req.body);
+
+      const userId = req.info?.id;
+
+      // Como el ID podría ser undefined, hay que hacer un resguardo:
+      if (!userId) throw new HTTPError(404, 'Not found', 'Not found user ID');
+
+      // Verificamos ese ID a través queryId del Repo User:
+      // Devuelve una promesa de User así que hay que poner un await.
+      // En este caso no hay que poner un resguardo si no encuentra porque el repo de User ya tira un error si no encuentra.
+      // Si tira un error, es agarrado por el Catch.
+      // Guardamos al usuario encontrado dentro de una variable.
+      const actualUser = await this.repoUser.queryId(userId);
+
+      // Tomamos de info el ID y se la agregamos al owner del body.
+      // En info tenemos los datos del usuario que tomamos desde el Token.
+      req.body.owner = userId;
+
+      const newThing = await this.repo.create(req.body);
+
+      // Ahora hay que agregar la cosa creada en el Array de cosas de este usuario en particular:
+      // Dentro del Array things del usuario, le hacemos un push del data creado.
+      // Hacemos un push que muta el Array que se encuentra dentro de la propiedad "things" del Object del User:
+      actualUser.things.push(newThing);
+
+      // Luego hay que hacer un Patch para actualizar los datos del User  en la base de datos.
+      // Le damos como parámetro el actual User que ya hemos mutado con el push:
+      this.repoUser.update(actualUser);
+
       resp.json({
-        results: [data],
+        results: [newThing],
       });
     } catch (error) {
       next(error);

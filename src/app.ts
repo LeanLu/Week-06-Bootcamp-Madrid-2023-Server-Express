@@ -7,6 +7,7 @@ import { thingsRouter } from './routers/things.router.js';
 import createDebug from 'debug';
 import { CustomError } from './errors/errors.js';
 import { usersRouter } from './routers/users.router.js';
+
 // En este caso, le agregamos al nombre que estamos en "app":
 const debug = createDebug('W6:app');
 

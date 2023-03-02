@@ -1,6 +1,7 @@
 import { ThingsFileRepo } from '../repository/things.file.repo';
 import { ThingsController } from './things.controller';
 import { NextFunction, Request, Response } from 'express';
+import { UsersMongoRepo } from '../repository/users.mongo.repo';
 
 describe('Given ThingsController', () => {
   // A ThingsController hay que darle un repo:
@@ -26,7 +27,9 @@ describe('Given ThingsController', () => {
   } as unknown as Response;
   const next = jest.fn() as unknown as NextFunction;
 
-  const controller = new ThingsController(repo);
+  const userRepo = {} as UsersMongoRepo;
+
+  const controller = new ThingsController(repo, userRepo);
 
   describe('When getAll method is called', () => {
     // Al ser los métodos del Controller async, hay que agregarle al test.

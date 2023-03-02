@@ -2,12 +2,15 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config.js';
 import bcrypt from 'bcryptjs';
+import { HTTPError } from '../errors/errors.js';
 
-// Definimos el type del payload:
-export type TokenPayload = {
+// Definimos la interface del payload:
+// Lo hacemos extends del payyload de jwt:
+export interface TokenPayload extends jwt.JwtPayload {
+  id: string;
   email: string;
   role: string;
-};
+}
 
 const salt = 10;
 
@@ -30,16 +33,17 @@ export class Auth {
   }
 
   // Para verificación del token:
-  static verifyJWT(token: string) {
+  static verifyJWT(token: string): TokenPayload {
     // Necesita como parámetro el token y el Secret.
     const result = jwt.verify(token, config.jwtSecret as string);
 
     // El verify devuelve un string si es un error o un payload si está Ok.
     // Entonces hacemos la verificación para lanzar un error:
-    if (typeof result === 'string') throw new Error('Invalid payload');
+    if (typeof result === 'string')
+      throw new HTTPError(498, 'Invalid Token', result);
 
     // Si no pasa por la línea anterior, es que esta OK y devolvemos el payload.
-    return result;
+    return result as TokenPayload;
   }
 
   // Este método de encriptación es async.
