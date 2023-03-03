@@ -7,6 +7,8 @@ import { thingsRouter } from './routers/things.router.js';
 import createDebug from 'debug';
 import { CustomError } from './errors/errors.js';
 import { usersRouter } from './routers/users.router.js';
+import path from 'path';
+import { __dirname } from './config.js';
 
 // En este caso, le agregamos al nombre que estamos en "app":
 const debug = createDebug('W6:app');
@@ -32,6 +34,9 @@ app.use((_req, _resp, next) => {
   debug('Soy un middleware');
   next();
 });
+
+debug(__dirname);
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 // _________________________________________________________________
 // MÉTODO PARA HACERLO CON ROUTER (MÉTODO A UTILIZAR):

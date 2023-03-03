@@ -8,7 +8,17 @@ import createDebug from 'debug';
 const debug = createDebug('W6:repo');
 
 export class ThingsMongoRepo implements Repo<ThingStructure> {
-  constructor() {
+  private static instance: ThingsMongoRepo;
+
+  public static getInstance(): ThingsMongoRepo {
+    if (!ThingsMongoRepo.instance) {
+      ThingsMongoRepo.instance = new ThingsMongoRepo();
+    }
+
+    return ThingsMongoRepo.instance;
+  }
+
+  private constructor() {
     debug('Repo instanced');
   }
 
@@ -21,14 +31,18 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
     // Le podemos dar otro parámetro opcional con las cosas que no queremos que aparezca.
     // En este caso la ref es 'User'.
     // Luego le damos la excepción que no queremos que muestre. Ex.: "things" y hay que darle un valor de cero.
-    const data = await ThingModel.find().populate('owner', { things: 0 });
+    const data = await ThingModel.find()
+      .populate('owner', { things: 0 })
+      .exec();
     return data;
   }
 
   async queryId(id: string): Promise<ThingStructure> {
     debug('queryID method');
     // Para la búsqueda por ID.
-    const data = await ThingModel.findById(id).populate('owner', { things: 0 });
+    const data = await ThingModel.findById(id)
+      .populate('owner', { things: 0 })
+      .exec();
 
     // Verificamos que haya un data y no sea undefined.
     // Utilizamos el error que generamos en la interface.
@@ -40,8 +54,12 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
 
   async create(info: Partial<ThingStructure>): Promise<ThingStructure> {
     debug('create method');
-    const data = await ThingModel.create(info);
-
+    const data = (await ThingModel.create(info)).populate('owner', {
+      things: 0,
+    });
+    // En este caso no hay que poner exec() porque el método create ya es una promesa.
+    // Create NO es una query.
+    // Y por eso hay que hacer el populate luego que se resuelva la promise y hay que encerrar el await dentro de paréntesis.
     return data;
   }
 
@@ -56,7 +74,9 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
     // Entonces hay agregarle al data un object modificador "new:true".
     const data = await ThingModel.findByIdAndUpdate(info.id, info, {
       new: true,
-    });
+    })
+      .populate('owner', { things: 0 })
+      .exec();
 
     // También podría ser undefined si no encuentra:
     if (!data) throw new HTTPError(404, 'Not found', 'ID not found in update');
@@ -64,7 +84,6 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
     return data;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   async destroy(id: string): Promise<void> {
     debug('destroy method');
     const data = await ThingModel.findByIdAndDelete(id);
@@ -86,7 +105,9 @@ export class ThingsMongoRepo implements Repo<ThingStructure> {
     value: unknown;
   }): Promise<ThingStructure[]> {
     debug('search method');
-    const data = await ThingModel.find({ [query.key]: query.value }).exec();
+    const data = await ThingModel.find({ [query.key]: query.value })
+      .populate('owner', { things: 0 })
+      .exec();
     return data;
   }
 }

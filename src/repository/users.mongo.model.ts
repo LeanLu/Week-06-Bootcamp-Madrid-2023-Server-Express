@@ -19,6 +19,14 @@ const userSchema = new Schema<UserStructure>({
       ref: 'Thing',
     },
   ],
+
+  // Para favorites:
+  // favorites: [
+  //   {
+  //     type: Schema.Types.ObjectId,
+  //     ref: 'Thing',
+  //   },
+  // ],
 });
 
 userSchema.set('toJSON', {

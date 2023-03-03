@@ -4,7 +4,10 @@ export type UserStructure = {
   id: string;
   email: string;
   password: string;
+  // Things es de cosas creadas:
   things: ThingStructure[];
+  // Favorites tiene la misma estructura que things de cosas creadas, pero se guardan cosas distintas.
+  // favorites: ThingStructure[];
 };
 
 // Agregamos la propiedad "things" para establecer la bidireccionalidad con el user asignado.

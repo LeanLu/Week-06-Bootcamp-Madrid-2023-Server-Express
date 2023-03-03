@@ -7,7 +7,25 @@ import createDebug from 'debug';
 const debug = createDebug('W6:users.repo');
 
 export class UsersMongoRepo implements Repo<UserStructure> {
-  constructor() {
+  // Patrón Singleton:
+  // Evitar duplicaciones de instancia de class.
+
+  // Generamos la propiedad instance private.
+  private static instance: UsersMongoRepo;
+
+  // Creamos el método public para poder instanciar la class.
+  // Pero para poder instanciar la class primero verifica que no haya sido instanciada antes.
+  public static getInstance(): UsersMongoRepo {
+    if (!UsersMongoRepo.instance) {
+      UsersMongoRepo.instance = new UsersMongoRepo();
+    }
+
+    return UsersMongoRepo.instance;
+  }
+
+  // Hacemos el constructor privado para que no sea instanciado desde afuera como new...
+  // Solo se podrá instanciar a través del método público getInstance creada arriba.
+  private constructor() {
     debug('Repo instanced');
   }
 
@@ -16,7 +34,12 @@ export class UsersMongoRepo implements Repo<UserStructure> {
     // Como no va a utilizar este método, lo dejamos para que cumpla con el implements de Repo.
     // Pero hacemos que devuelva un Array vacío.
     // const data = await UserModel.find();
-    return [];
+
+    // Hacemos el populate de las things para que cada usuario pueda ver las propiedades de sus things.
+    // Pero sacamos el "owner" porque sería redundante que cada usuario se vea así mismo como owner.
+    const data = await UserModel.find().populate('things', { owner: 0 });
+
+    return data;
   }
 
   async queryId(id: string): Promise<UserStructure> {

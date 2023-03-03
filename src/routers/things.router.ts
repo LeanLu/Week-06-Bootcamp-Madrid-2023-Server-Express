@@ -15,15 +15,17 @@ export const thingsRouter = Router();
 // const repo = new ThingsFileRepo();
 
 // Ahora con Mongoose:
-const repo = new ThingsMongoRepo();
+// Y con el patrón Singleton:
+const repoThing = ThingsMongoRepo.getInstance();
 
 // Instanciamos también el repo de User para inyectarlo en el Controller de Things:
-const repoUser = new UsersMongoRepo();
+// Utilizamos el método public de UserMongoRepo para instanciarlo que primero verifica si no fue ya instanciado antes.
+const repoUser = UsersMongoRepo.getInstance();
 
 // Instanciamos la class ThingsController para utilizar los métodos:
 // Le hacemos una inyección de dependencia al controller con el repo:
 // Le inyectamos también el repo de User:
-const controller = new ThingsController(repo, repoUser);
+const controller = new ThingsController(repoThing, repoUser);
 
 // Similar al app.get(), etc.:
 // En las callbacks llamamos a los métodos del Controller:
@@ -31,22 +33,22 @@ const controller = new ThingsController(repo, repoUser);
 
 // Agregamos la protección de logged en la ruta get:
 // Para ver las cosas podría ser opcional estar logueado.
-thingsRouter.get('/', logged, controller.getAll.bind(controller));
+thingsRouter.get('/', controller.getAll.bind(controller));
 // También para ver alguna cosa por ID también podría ser opcional estar logueado.
-thingsRouter.get('/:id', logged, controller.get.bind(controller));
+thingsRouter.get('/:id', controller.get.bind(controller));
 
 thingsRouter.post('/', logged, controller.post.bind(controller));
 
 thingsRouter.patch(
   '/:id',
   logged,
-  authorized,
+  (req, resp, next) => authorized(req, resp, next, repoThing),
   controller.patch.bind(controller)
 );
 
 thingsRouter.delete(
   '/:id',
   logged,
-  authorized,
+  (req, resp, next) => authorized(req, resp, next, repoThing),
   controller.delete.bind(controller)
 );

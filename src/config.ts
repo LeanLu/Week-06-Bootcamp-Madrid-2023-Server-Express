@@ -2,7 +2,8 @@
 
 // Primero hacemos la importación del dotenv:
 import dotenv from 'dotenv';
-
+import { fileURLToPath } from 'url';
+import path from 'path';
 // Hacemos la configuración para tomar las variables:
 dotenv.config();
 
@@ -15,3 +16,5 @@ export const config = {
   dbName: process.env.DB_NAME,
   jwtSecret: process.env.SECRET,
 };
+
+export const __dirname = path.dirname(fileURLToPath(import.meta.url));

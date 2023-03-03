@@ -13,7 +13,20 @@ export class UsersController {
     debug('Controller instanced');
   }
 
-  // Tendría que hacer la operación básica de Login y Register:
+  // Agregamos el método para cargar todos los users:
+  async getAll(_req: Request, resp: Response, next: NextFunction) {
+    try {
+      debug('getAll method');
+      const data = await this.repo.query();
+      resp.json({
+        results: data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Luego tendría que hacer la operación básica de Login y Register:
 
   // Tomamos el Post que había antes y lo llamamos register:
   async register(req: Request, resp: Response, next: NextFunction) {
