@@ -1,14 +1,14 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import { thingsRouter } from './routers/things.router.js';
 
 // Importamos la variable debug:
 import createDebug from 'debug';
-import { CustomError } from './errors/errors.js';
 import { usersRouter } from './routers/users.router.js';
 import path from 'path';
 import { __dirname } from './config.js';
+import { errorsMiddleware } from './middlewares/errors.middleware.js';
 
 // En este caso, le agregamos al nombre que estamos en "app":
 const debug = createDebug('W6:app');
@@ -100,30 +100,35 @@ app.patch('/:id');
 
 app.delete('/:id');
 
-app.use(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (error: CustomError, _req: Request, resp: Response, _next: NextFunction) => {
-    debug('Soy el middleware de errores');
+// Teníamos el Middleware de Errores en App.
+// Pero lo movimos a la carpeta Middleware:
+// app.use(
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   (error: CustomError, _req: Request, resp: Response, _next: NextFunction) => {
+//     debug('Soy el middleware de errores');
 
-    // Definimos la constante status con el statusCode que haya venido y si no vino nada, se queda con el 500:
-    const status = error.statusCode || 500;
-    // Lo mismo para el mensaje:
-    const statusMessage = error.statusMessage || 'Internal server error';
+//     // Definimos la constante status con el statusCode que haya venido y si no vino nada, se queda con el 500:
+//     const status = error.statusCode || 500;
+//     // Lo mismo para el mensaje:
+//     const statusMessage = error.statusMessage || 'Internal server error';
 
-    // Definimos el Status de la respuesta:
-    resp.status(status);
+//     // Definimos el Status de la respuesta:
+//     resp.status(status);
 
-    // Se envía la respuesta como json porque esto lo recibe la consola del usuario.
-    // Se envíán las variables definidas arriba.
-    resp.json({
-      error: [
-        {
-          status,
-          statusMessage,
-        },
-      ],
-    });
-    // Luego enviamos la información por consola interna:
-    debug(status, statusMessage, error.message);
-  }
-);
+//     // Se envía la respuesta como json porque esto lo recibe la consola del usuario.
+//     // Se envíán las variables definidas arriba.
+//     resp.json({
+//       error: [
+//         {
+//           status,
+//           statusMessage,
+//         },
+//       ],
+//     });
+//     // Luego enviamos la información por consola interna:
+//     debug(status, statusMessage, error.message);
+//   }
+// );
+
+// Usamos el Middleware de errors desde App:
+app.use(errorsMiddleware);

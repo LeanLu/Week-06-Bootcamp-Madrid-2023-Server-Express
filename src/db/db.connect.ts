@@ -11,7 +11,12 @@ const { user, password, cluster, dbName } = config;
 
 // Creamos una función que sea capaz de conectarse con la base de datos:
 // Devuelve una promise de mongus (de conexión):
-export const dbConnect = () => {
+export const dbConnect = (env?: string) => {
+  // Generamos una variable para que si tiene un valor u otro, esté en contexto de testing o no.
+  // De esta manera podemos realizar el super test luego.
+  const finalEnv = env || process.env.NODE_ENV;
+  const finalDBName = finalEnv === 'test' ? dbName + '_Testing' : dbName;
+
   // Guardamos la URL del Atlas como un template string:
   const uri = `mongodb+srv://${user}:${password}@${cluster}/${dbName}?retryWrites=true&w=majority`;
 
