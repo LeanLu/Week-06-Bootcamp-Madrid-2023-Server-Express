@@ -9,7 +9,9 @@
     "start:mon": "cross-env DEBUG=W6* PORT=4500 nodemon ./dist/index.js",
     "build": "tsc -w",
     "test": "jest --watchAll --coverage",
-    "test:prod": "jest --watchAll --coverage --watchAll=false --passWithNoTests"
+    "test:prod": "jest --watchAll --coverage --watchAll=false --passWithNoTests",
+    "copy:public": "copyfiles -u 1 src/public/**/*.* dist",
+    "prebuild": "npm run copy:public"
   },
   "author": "Leandro",
   "license": "ISC",
@@ -38,6 +40,7 @@
     "@types/morgan": "^1.9.4",
     "bcryptjs": "^2.4.3",
     "commander": "^10.0.0",
+    "copyfiles": "^2.4.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "debug": "^4.3.4",
